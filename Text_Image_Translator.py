@@ -1,20 +1,34 @@
 from PIL import Image
 import random
 from File_Handler import save_file, upload_file
+import time as Time
+
 
 class Text_Image_Translator:
-    def __init__(self, seed = 0):
+    def __init__(self, seed = 0, DEBUG = False):
         self.chars = []
-        for i in range(255*255*255-2):
+
+        self.DEBUG = DEBUG
+        if DEBUG:
+            startTime = Time.time()
+
+        for i in range(255**3-2):
             if i < 1114112:
                 self.chars.append(chr(i))
             else:
                 self.chars.append(' ')
+
         self.chars.append(' ')
         self.chars.append('\n')
+        if DEBUG:
+            print('Time to add chars:', Time.time()-startTime)
 
         self.seed = seed
+        if DEBUG:
+            startTime = Time.time()
         self.randomize(seed)
+        if DEBUG:
+            print('Time to randomize:', Time.time()-startTime)
 
     def set_seed(self, seed):
         self.seed = seed
@@ -46,6 +60,9 @@ class Text_Image_Translator:
         return self.chars[index]
     
     def encrypt(self, text):
+        if self.DEBUG:
+            startTime = Time.time() 
+
         length = len(text)
         width, height = self.get_dimensions(length)
         img = Image.new('RGB', (width, height))
@@ -58,9 +75,13 @@ class Text_Image_Translator:
                 else:
                     r, g, b = self.get_rgb(' ')
                 pixels[i, j] = (r, g, b)
+        if self.DEBUG:
+            print('Time to encrypt:', Time.time()-startTime)
         return img
     
     def decrypt(self, img):
+        if self.DEBUG:
+            startTime = Time.time()
         width, height = img.size
         pixels = img.load()
         text = ''
@@ -68,6 +89,8 @@ class Text_Image_Translator:
             for j in range(height):
                 r, g, b = pixels[i, j]
                 text += self.get_char(r, g, b)
+        if self.DEBUG:
+            print('Time to decrypt:', Time.time()-startTime)
         return text
     
     def save_file(self, image):
@@ -78,7 +101,7 @@ class Text_Image_Translator:
 
 if __name__ == '__main__':
     import sys
-    translator = Text_Image_Translator()
+    translator = Text_Image_Translator(DEBUG=True)
 
     if len(sys.argv) < 2:
         print('Usage: python Text_Image_Translator.py <command> <args>')
