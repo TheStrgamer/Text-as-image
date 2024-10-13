@@ -29,24 +29,26 @@ class Text_Image_Translator:
             print('Time to add chars:', Time.time()-startTime)
 
         self.seed = seed
-        if DEBUG:
-            startTime = Time.time()
-        self.randomize(seed)
-        if DEBUG:
-            print('Time to randomize:', Time.time()-startTime)
-
+        self.randomized = False
     def set_seed(self, seed):
         """
         Used to set the seed of the randomizer
         """
-        self.seed = seed
-        self.randomize(seed)
+        if self.DEBUG:
+            print('Seed set to:', int(seed))
+        self.seed = int(seed)
+        self.randomize(self.seed)
+        self.randomized = True
 
     def randomize(self, seed):
         """
         Randomizes the order of the characters
         """
+        if self.DEBUG:
+            time = Time.time()
         random.seed(seed)
+        if self.DEBUG:
+            print('Time to randomize:', Time.time()-time)
         random.shuffle(self.chars)
 
     def get_dimensions(self, length):
@@ -84,6 +86,9 @@ class Text_Image_Translator:
         Encrypts the given text into an image
         Returns the image as a PIL Image object
         """
+        if not self.randomized:
+            self.randomize(self.seed)
+            self.randomized = True
         if self.DEBUG:
             startTime = Time.time() 
 
@@ -109,6 +114,9 @@ class Text_Image_Translator:
         Decrypts the given image into a text string
         Returns the translated string
         """
+        if not self.randomized:
+            self.randomize(self.seed)
+            self.randomized = True
         if self.DEBUG:
             startTime = Time.time()
         width, height = img.size

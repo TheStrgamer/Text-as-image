@@ -17,8 +17,6 @@ class TranslatorInterface(customtkinter.CTk):
         self.height = 510
         self.geometry(f"{self.width}x{self.height}")
 
-        self.translator = Text_Image_Translator(DEBUG=False)
-        
         self.pages = {}
         self.show_main_page()
         self.mainloop()
@@ -57,7 +55,7 @@ class IndexPage(customtkinter.CTkFrame):
 class EncryptPage(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.translator = master.translator
+        self.translator = Text_Image_Translator(DEBUG=True)
         self.title = customtkinter.CTkLabel(self, text="Encrypt", font=("Arial", 24))
         self.title.pack(pady=10)
 
@@ -88,7 +86,10 @@ class EncryptPage(customtkinter.CTkFrame):
         self.save_button.configure(state="normal")
         text = self.text_entry.get("1.0", "end-1c")
         seed = self.seed_entry.get()
-        self.translator.set_seed(seed)
+        seed = seed.strip()
+
+        if seed != "":
+            self.translator.set_seed(seed)
         self.translated_image = self.translator.encrypt(text)
         self.display_image(self.translated_image)
 
@@ -111,28 +112,64 @@ class EncryptPage(customtkinter.CTkFrame):
 class DecryptPage(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
+        self.translator = Text_Image_Translator(DEBUG=True)
         self.title = customtkinter.CTkLabel(self, text="Decrypt", font=("Arial", 24))
-        self.title.pack(pady=20)
+        self.title.pack(pady=10)
 
+        self.frame = customtkinter.CTkFrame(self)
+        self.frame.pack(pady=5)
+
+        self.seed_entry = customtkinter.CTkEntry(self.frame, placeholder_text="Enter a seed (optional)", width=150)
+        self.seed_entry.pack(padx=5, side="left")
+
+        self.load_button = customtkinter.CTkButton(self.frame, text="Load image", command=self.load_image)
+        self.load_button.pack(padx=5, side="left")
+
+        self.decrypt_button = customtkinter.CTkButton(self.frame, text="Decrypt", command=self.decrypt, state="disabled")
+        self.decrypt_button.pack(padx=5, side="left")
+
+        self.back_button = customtkinter.CTkButton(self, text="Return", command=lambda: master.switch_page(IndexPage))
+        self.back_button.place(x=10, y=10, anchor="nw")
+        
         self.image = customtkinter.CTkLabel(self, text="")
         self.image.pack(pady=20)
 
-        self.display_image()
+        self.text_entry = customtkinter.CTkTextbox(self, width=600, height=150, state="disabled")
+        self.text_entry.pack(pady=5)
 
-        self.back_button = customtkinter.CTkButton(self, text="Back to Main", command=lambda: master.switch_page(IndexPage))
-        self.back_button.pack(pady=10)
-
-    def display_image(self, img=None):    
+    def display_image(self, image=None):    
         try:
-            if not img:
+            if not image:
                 img = customtkinter.CTkImage(Image.open("example.png"), size=(200, 200))
             else:
+                img = image
+                img = img.resize((200, 200), Image.NEAREST)
                 img = customtkinter.CTkImage(img, size=(200, 200))
 
             self.image.configure(image=img)
             self.image.image = img
         except Exception as e:
             self.image.configure(text=f"Error loading image: {e}")
+    def load_image(self):
+        self.image_file = upload_file()
+        self.display_image(self.image_file)
+        self.decrypt_button.configure(state="normal")
+
+    def fill_text_entry(self):
+        print(self.text)
+        self.text_entry.configure(state="normal")
+        self.text_entry.delete("1.0", "end")
+        self.text_entry.insert("1.0", self.text)
+        self.text = ""
+        self.text_entry.configure(state="disabled")
+
+    def decrypt(self):
+        seed = self.seed_entry.get()
+        seed = seed.strip()
+        if seed != "":
+            self.translator.set_seed(seed)
+        self.text = self.translator.decrypt(self.image_file)
+        self.fill_text_entry()
   
 
 if __name__ == '__main__':
