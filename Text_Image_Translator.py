@@ -12,6 +12,7 @@ class Text_Image_Translator:
     """
     def __init__(self, seed = 0, DEBUG = False):
         self.chars = []
+        self.char_index = {}
 
         self.DEBUG = DEBUG
         if DEBUG:
@@ -47,9 +48,11 @@ class Text_Image_Translator:
         if self.DEBUG:
             time = Time.time()
         random.seed(seed)
+        random.shuffle(self.chars)
         if self.DEBUG:
             print('Time to randomize:', Time.time()-time)
-        random.shuffle(self.chars)
+        for i in range(len(self.chars)):
+            self.char_index[self.chars[i]] = i
 
     def get_dimensions(self, length):
         """
@@ -68,7 +71,7 @@ class Text_Image_Translator:
         """
         Returns the RGB values based on the index of the given character in the list
         """
-        index = self.chars.index(char)
+        index = self.char_index[char]
         r = index // 255 // 255
         g = index // 255 % 255
         b = index % 255
@@ -90,6 +93,7 @@ class Text_Image_Translator:
             self.randomize(self.seed)
             self.randomized = True
         if self.DEBUG:
+            print('start encrypt')  
             startTime = Time.time() 
 
         length = len(text)
@@ -107,6 +111,7 @@ class Text_Image_Translator:
                 pixels[i, j] = (r, g, b)
         if self.DEBUG:
             print('Time to encrypt:', Time.time()-startTime)
+            print('end encrypt')
         return img
     
     def decrypt(self, img):
@@ -207,23 +212,4 @@ if __name__ == '__main__':
         else:
             print('Invalid command')
             sys.exit(1)         
-
-
-    
-
-
-
-
-
-        
-
-        
-
-
-
-
-    
-
-
-
 
