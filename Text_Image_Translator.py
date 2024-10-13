@@ -30,15 +30,18 @@ class Text_Image_Translator:
             print('Time to add chars:', Time.time()-startTime)
 
         self.seed = seed
+        self.last_seed = seed
         self.randomized = False
     def set_seed(self, seed):
         """
         Used to set the seed of the randomizer
         """
-        if self.DEBUG:
-            print('Seed set to:', int(seed))
         self.seed = int(seed)
-        self.randomize(self.seed)
+        if self.seed != self.last_seed:
+            self.last_seed = self.seed
+            self.randomize(self.seed)
+            if self.DEBUG:
+                print('Seed set to:', int(seed))
         self.randomized = True
 
     def randomize(self, seed):
