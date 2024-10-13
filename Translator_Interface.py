@@ -14,7 +14,7 @@ class TranslatorInterface(customtkinter.CTk):
         self.title('Text Image Translator')
 
         self.width = 650
-        self.height = 500
+        self.height = 510
         self.geometry(f"{self.width}x{self.height}")
 
         self.translator = Text_Image_Translator(DEBUG=False)
