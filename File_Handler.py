@@ -12,7 +12,7 @@ def save_file(image, path = None):
         raise ValueError('Invalid image')
     image.save(path)
 
-def upload_file(filename):
+def upload_file(filename = None):
     """
     Opens the given file and returns the image
     Opens a file dialog if no filename is given
