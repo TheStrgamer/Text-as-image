@@ -13,7 +13,7 @@ class Text_Image_Translator:
 
     """
     def __init__(self, seed = 0, DEBUG = False):
-        self.chars = np.array([' ' for i in range(255**3)], dtype='U1')
+        self.chars = np.array([' ' for i in range(int(255**3/10))], dtype='U1')
         self.char_index = {}
 
         self.DEBUG = DEBUG
@@ -27,6 +27,8 @@ class Text_Image_Translator:
         self.chars[-1] = '\n'
 
         self.chars_original = self.chars.copy()
+        for i in range(len(self.chars)):
+            self.char_index[self.chars[i]] = i
 
         if DEBUG:
             print('Time to add chars:', Time.time()-startTime)
@@ -66,19 +68,19 @@ class Text_Image_Translator:
         Calculates the dimensions of the image based on the length of the text
         """
         sqrt = length**0.5
-        if sqrt%1 != 0:
-            width = int(sqrt)+1
-            height = int(sqrt)
+        if round(sqrt)**2 < length:
+            width = round(sqrt)+1
+            height = round(sqrt)
         else:
-            width = int(sqrt)
-            height = int(sqrt)
+            width = round(sqrt)
+            height = round(sqrt)
         return width, height
     
     def get_rgb(self, char):
         """
         Returns the RGB values based on the index of the given character in the list
         """
-        index = self.char_index[char]
+        index = self.char_index[char]*10
         r = index // 255 // 255
         g = index // 255 % 255
         b = index % 255
@@ -89,7 +91,7 @@ class Text_Image_Translator:
         Returns the character based on the RGB values
         """
         index = r*255*255 + g*255 + b
-        return self.chars[index]
+        return self.chars[index//10]
     
     def encrypt(self, text):
         """
