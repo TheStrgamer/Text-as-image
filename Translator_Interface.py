@@ -10,6 +10,8 @@ customtkinter.set_default_color_theme("blue")
 class TranslatorInterface(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+        self.translator = Text_Image_Translator(DEBUG=True)
+
 
         self.title('Text Image Translator')
 
@@ -55,7 +57,7 @@ class IndexPage(customtkinter.CTkFrame):
 class EncryptPage(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.translator = Text_Image_Translator(DEBUG=True)
+        self.translator = master.translator
         self.title = customtkinter.CTkLabel(self, text="Encrypt", font=("Arial", 24))
         self.title.pack(pady=10)
 
@@ -112,7 +114,8 @@ class EncryptPage(customtkinter.CTkFrame):
 class DecryptPage(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.translator = Text_Image_Translator(DEBUG=True)
+        self.translator = master.translator
+
         self.title = customtkinter.CTkLabel(self, text="Decrypt", font=("Arial", 24))
         self.title.pack(pady=10)
 
