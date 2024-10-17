@@ -63,13 +63,13 @@ class File_Image_Translator:
         self.numbers = [i for i in range(256)]
         np.random.shuffle(self.numbers)
         for i in range(len(self.numbers)):
-            self.mapped_ints[i] = self.numbers[i]
+            self.mapped_ints[self.numbers[i]] = i
 
         np.random.seed(seed)
         self.chars = self.chars_original.copy()
         np.random.shuffle(self.chars)
         for i in range(len(self.chars)):
-            self.char_index[self.chars[i]] = i        
+            self.char_index[self.chars[i]] = i 
         
         if self.DEBUG:
             print('Time to randomize:', Time.time()-time)
@@ -106,6 +106,14 @@ class File_Image_Translator:
         b = self.char_index[c]
         
         return self.get_rgb(r, g, b)
+    
+    def get_char(self, r, g, b):
+        """
+        Returns the character based on the RGB values
+        """
+        int1, int2, int3 = self.get_ints(r, g, b)
+        return self.chars[int1] + self.chars[int2] + self.chars[int3]
+
 
     def get_ints(self, r, g, b):
         """
@@ -129,7 +137,6 @@ class File_Image_Translator:
         if len(data) % 3 != 0:
             length += 1
         width, height = self.get_dimensions(length)
-        print(length, width, height)
 
         bytes = []
         for byte in data:
@@ -140,7 +147,7 @@ class File_Image_Translator:
 
         for i in range(extencion_pixel_count+1):
             if i == 0:
-                r, g, b = self.get_rgb(extencion_pixel_count, 0, 0)
+                r, g, b = extencion_pixel_count, 0, 0
             else:
                 r_char, g_char, b_char = ' ', ' ', ' '
                 if i*3-3 < len(filetype):
@@ -176,6 +183,27 @@ class File_Image_Translator:
     def decrypt(self, img):
         if self.randomized == False:
             self.randomize(self.seed)
+
+        pixels = img.load()
+        width, height = img.size
+        extencion_pixel_count = pixels[0, 0][0]
+        extencion = ''
+
+        for i in range(1, extencion_pixel_count+1):
+            r, g, b = pixels[0, i]
+            extencion += self.get_char(r, g, b)
+        data = []
+        for i in range(width):
+            for j in range(height):
+                if i == 0 and j <= extencion_pixel_count:
+                    continue
+                r, g, b = pixels[i, j]
+                r, g, b = self.get_ints(r, g, b)
+                data.append(r)
+                data.append(g)
+                data.append(b)
+        return bytes(data), extencion
+
     
     def save_file(self, image):
         """
@@ -214,6 +242,7 @@ if __name__ == '__main__':
     def encrypt(*args):
         print(args)
         translator = File_Image_Translator(DEBUG=True)
+        
         if len(args) < 4:
             print('Usage: python File_Image_Translator.py encrypt <in_filename> <out_filename> [seed](optional)')
             sys.exit(1)
@@ -235,8 +264,13 @@ if __name__ == '__main__':
         if len(sys.argv) == 5:
             seed = int(sys.argv[4])
             translator.set_seed(seed)
-        image = translator.upload_image_file(in_path)
-        data = translator.decrypt(image)
+        image = upload_image_file(in_path)
+        data, extencion = translator.decrypt(image)
+        if '.' in out_path:
+            out_path = out_path.split('.')
+            out_path.remove(out_path[-1])
+            out_path = '.'.join(out_path)
+        out_path += '.' + extencion
         with open(out_path, 'wb') as file:
             file.write(data)
     
