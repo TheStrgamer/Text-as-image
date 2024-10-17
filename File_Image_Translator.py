@@ -137,6 +137,9 @@ class File_Image_Translator:
         if len(data) % 3 != 0:
             length += 1
         width, height = self.get_dimensions(length)
+        print('length:', length, end=' ')
+        print('width:', width, end=' ')
+        print('height:', height)
 
         bytes = []
         for byte in data:
@@ -145,23 +148,27 @@ class File_Image_Translator:
         image = Image.new('RGB', (width, height))
         pixels = image.load()
 
-        for i in range(extencion_pixel_count+1):
-            if i == 0:
+        w_index = 0
+        for h_index in range(extencion_pixel_count+1):
+            if h_index == 0:
                 r, g, b = extencion_pixel_count, 0, 0
             else:
                 r_char, g_char, b_char = ' ', ' ', ' '
-                if i*3-3 < len(filetype):
-                    r_char = filetype[i*3-3]
-                if i*3-2 < len(filetype):
-                    g_char = filetype[i*3-2]
-                if i*3-1 < len(filetype):
-                    b_char = filetype[i*3-1]
+                if h_index*3-3 < len(filetype):
+                    r_char = filetype[h_index*3-3]
+                if h_index*3-2 < len(filetype):
+                    g_char = filetype[h_index*3-2]
+                if h_index*3-1 < len(filetype):
+                    b_char = filetype[h_index*3-1]
                 r, g, b = self.get_char_rgb(r_char, g_char, b_char)
-            pixels[0, i] = (r, g, b)
+            if h_index >= height:
+                h_index = 0
+                w_index += 1
+            pixels[w_index, h_index] = (r, g, b)
         index = 0
         for i in range(width):
             for j in range(height):
-                if i == 0 and j < extencion_pixel_count+1:
+                if (i < w_index or (i==w_index and j <= h_index)):
                     print('continue')
                     continue
                 if index < len(bytes):  
@@ -189,13 +196,17 @@ class File_Image_Translator:
         extencion_pixel_count = pixels[0, 0][0]
         extencion = ''
 
-        for i in range(1, extencion_pixel_count+1):
-            r, g, b = pixels[0, i]
+        w_index = 0
+        for h_index in range(1, extencion_pixel_count+1):
+            if h_index >= height:
+                h_index = 0
+                w_index += 1
+            r, g, b = pixels[w_index, h_index]
             extencion += self.get_char(r, g, b)
         data = []
         for i in range(width):
             for j in range(height):
-                if i == 0 and j <= extencion_pixel_count:
+                if (i < w_index or (i==w_index and j <= h_index)):
                     continue
                 r, g, b = pixels[i, j]
                 r, g, b = self.get_ints(r, g, b)
