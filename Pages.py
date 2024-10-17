@@ -1,5 +1,5 @@
 import customtkinter
-from File_Handler import save_file, upload_file
+from File_Handler import save_image_file, upload_image_file
 from PIL import Image
 
 
@@ -41,7 +41,7 @@ class EncryptPage(customtkinter.CTkFrame):
         self.submit_button = customtkinter.CTkButton(self.frame, text="Encrypt", command=self.on_submit)
         self.submit_button.pack(padx=5, side="left")
 
-        self.save_button = customtkinter.CTkButton(self.frame, text="Save", command=lambda: save_file(self.translated_image), state="disabled")
+        self.save_button = customtkinter.CTkButton(self.frame, text="Save", command=lambda: save_image_file(self.translated_image), state="disabled")
         self.save_button.pack(padx=5, side="left")
 
         self.back_button = customtkinter.CTkButton(self, text="Return", command=lambda: master.switch_page(IndexPage))
@@ -75,7 +75,7 @@ class EncryptPage(customtkinter.CTkFrame):
             self.image.configure(text=f"Error loading image: {e}")
     
     def save_image(self):
-        save_file(self.translated_image)
+        save_image_file(self.translated_image)
 
 class DecryptPage(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -120,7 +120,7 @@ class DecryptPage(customtkinter.CTkFrame):
         except Exception as e:
             self.image.configure(text=f"Error loading image: {e}")
     def load_image(self):
-        self.image_file = upload_file()
+        self.image_file = upload_image_file()
         self.display_image(self.image_file)
         self.decrypt_button.configure(state="normal")
 
@@ -133,10 +133,16 @@ class DecryptPage(customtkinter.CTkFrame):
         self.text_entry.configure(state="disabled")
 
     def decrypt(self):
-        seed = self.seed_entry.get()
-        seed = seed.strip()
-        if seed != "":
-            self.translator.set_seed(seed)
-        self.text = self.translator.decrypt(self.image_file)
-        self.fill_text_entry()
+        try:
+            seed = self.seed_entry.get()
+            seed = seed.strip()
+            if seed != "":
+                self.translator.set_seed(seed)
+            self.text = self.translator.decrypt(self.image_file)
+            self.fill_text_entry()
+        except UnicodeEncodeError:
+            self.text_entry.configure(state="normal")
+            self.text_entry.delete("1.0", "end")
+            self.text_entry.insert("1.0", "Error: Image with binary data cannot be decrypted as text\n Try the decrypt file option on the main menu")
+            self.text_entry.configure(state="disabled")
   
