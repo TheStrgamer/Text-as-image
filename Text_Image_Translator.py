@@ -1,6 +1,6 @@
 from PIL import Image
 import random
-from File_Handler import save_file, upload_file
+from File_Handler import save_image_file, upload_image_file as save_file, upload_file
 import time as Time
 import numpy as np
 
