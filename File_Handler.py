@@ -22,13 +22,16 @@ def upload_image_file(filename = None):
         filename = filedialog.askopenfilename(filetypes=f_types)
     return Image.open(filename)
 
-def save_file(data, path = None):
+def save_file(data, path = None, extension = None): 
     """
     Saves the given data to the given path
     Opens a file dialog if no path is given
     """
     if path is None:
-        path = filedialog.asksaveasfilename()
+        if extension is not None:
+            path = filedialog.asksaveasfilename(defaultextension=extension)
+        else:
+            path = filedialog.asksaveasfilename()
     with open(path, 'wb') as file:
         file.write(data)
 def upload_file(filename = None):
@@ -38,5 +41,6 @@ def upload_file(filename = None):
     """
     if filename is None:
         filename = filedialog.askopenfilename()
+    filename_trimmed = filename.split('/')[-1]
     with open(filename, 'rb') as file:
-        return file.read()
+        return file.read(), filename_trimmed

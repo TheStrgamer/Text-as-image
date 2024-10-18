@@ -1,4 +1,5 @@
 from Text_Image_Translator import Text_Image_Translator
+from File_Image_Translator import File_Image_Translator
 import customtkinter
 
 from Pages import IndexPage, EncryptPage, DecryptPage
@@ -10,6 +11,7 @@ class TranslatorInterface(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.translator = Text_Image_Translator(DEBUG=True)
+        self.file_translator = File_Image_Translator(DEBUG=True)
 
 
         self.title('Text Image Translator')

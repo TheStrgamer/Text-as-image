@@ -124,10 +124,15 @@ class File_Image_Translator:
         int3 = self.mapped_ints[b]
         return int1, int2, int3
     
-    def encrypt(self, file_path):
+    def encrypt(self, file_path = None, data = None):
         if self.randomized == False:
             self.randomize(self.seed)
-        data = upload_file(file_path)
+        if data is None and file_path is None:
+            print('No data given')
+            return
+        if data is None:
+            data, file_path = upload_file(file_path)
+        
         filetype = file_path.split('.')[-1]
         extencion_pixel_count = len(filetype) // 3
         if len(filetype) % 3 != 0:
