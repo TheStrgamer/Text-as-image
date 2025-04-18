@@ -13,7 +13,6 @@ class TranslatorInterface(customtkinter.CTk):
         self.translator = Text_Image_Translator(DEBUG=True)
         self.file_translator = File_Image_Translator(DEBUG=True)
 
-
         self.title('Text Image Translator')
 
         self.width = 650

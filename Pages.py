@@ -248,7 +248,7 @@ class DecryptFilePage(customtkinter.CTkFrame):
         self.image = customtkinter.CTkLabel(self, text="")
         self.image.pack(pady=20)
 
-        self.save_button = customtkinter.CTkButton(self, text="Save", command=self.save_file, state="disabled")
+        self.save_button = customtkinter.CTkButton(self, text="Save file", command=self.save_file, state="disabled")
         self.save_button.pack(pady=5)
 
 
