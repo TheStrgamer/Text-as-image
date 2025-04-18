@@ -39,3 +39,28 @@ python File_Image_Translator.py encrypt input.file output.png [seed]
 python File_Image_Translator.py decrypt input.png output.file [seed]
 ```
 
+## Some images of usage
+
+### File encrypted using seed 3349
+![result](images/used_seed_3349.png)
+
+### The main menu of the GUI
+![main menu](images/main.png)
+
+### The page for encrypting text
+![encrypt text](images/encrypt_text.png)
+
+### The page for decrypting text
+![decrypt text](images/decrypt_text.png)
+
+### The result of decrypting with incorrect seed
+![decrypt wrong seed](images/decrypt_text_wrong_seed.png)
+
+### The page for encrypting a file
+![encrypt file](images/encrypt_file.png)
+
+### The page for decrypting a file
+![decrypt file](images/decrypt_file.png)
+
+
+
